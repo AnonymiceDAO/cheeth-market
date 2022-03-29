@@ -25,39 +25,43 @@
       padding-bottom: calc(1.5vw + 150px) !important;
   }
 
-/* Approval section */
+/* Onboarding section */
 
-#approval {
-    margin: 0;
-    width: 45%;
+#onboarding-alert p {
+    width: 50%;
     margin: auto;
+    text-align: center;
+}
+
+.onboarding-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.onboarding {
+    width: 25%;
+    display: inline-block;
+    margin: 0;
     margin-top: 1vw;
     margin-bottom: 1vw;
-	font-family: "IBM Plex Mono Medium";
 }
 
-#approval h2 {
-    display: inline;
-}
-
-#approval-button {
+.onboarding button {
     background-color: white;
     color: black;
     display: inline;
     margin-top: 1vw;
     margin-bottom: 1vw;
-    width: 90%;
+    width: 75%;
+    height: 7vh;
 }
 
-#approval h1 {
+.onboarding h1 {
     margin: 0;
 }
 
-h2 {
-    color: #333333;
-}
-
-/* End approval section */
+/* end onboarding section */
 
 #market-section {
     padding-top: 0;
@@ -459,6 +463,12 @@ h4 {
 
 @media screen and (max-width: 767px) {
 
+    #before-buying {
+        font-size: 4.4vh !important;
+        line-height: 4.4vh !important;
+        color: #333333;
+    }
+
     #no-live-msg {
         width: 95%;
         margin: auto;
@@ -493,23 +503,40 @@ h4 {
         height: initial;
       }
 
-    /* Approval section*/
+    /* Onboarding section*/
 
-    #approval {
+    #onboarding-alert p {
+        width: 95%;
+        margin: auto !important;
+    }
+
+    #onboarding-section {
+        padding-top: 25px !important;
+        padding-bottom: 25px !important;
+    }
+
+    .onboarding-wrapper {
+        display: initial;
+    }
+
+    .onboarding {
         width: 90%;
     }
 
-    #approval h1 {
+    .onboarding h1 {
         font-size: 4.5vh !important;
         line-height: 4.5vh !important;
     }
 
-    #approval-button {
-        width: 90%;
-        margin-top: 2vh;
+    #wl-select {
+        margin-top: 25px;
     }
 
-    /* End approval section*/
+    .onboarding button {
+        width: 90%;
+    }
+
+    /* End onboarding section*/
 
 
     #selector-div button {

@@ -153,13 +153,22 @@
          </div>
       </div>
    </div>
-   <div class="section body-section body-1 wf-section hidden" id="approval-container" style="text-align: center;">
-      <div id="approval" style="text-align: center;">
-         <h2>To spend $CHEETH on whitelist spots, approve the market contract to spend your $CHEETH.</h2><br>
-         <button class="button" id="approval-button" onclick="approveTokenToMarket()">APPROVE</button>
+   <div class="section body-section body-1 wf-section" id="onboarding-section" style="text-align: center;">
+      <div id="onboarding-alert" class="hidden">
+         <h1 id="before-buying">Before buying...</h1>
+         <p>To purchase WL spots, set a Discord ID and approve the market to spend your $CHEETH.</p>
+      </div>
+      <div class="onboarding-wrapper">
+         <div id="approval" class="onboarding hidden" style="text-align: center;">
+            <h2>APPROVE MARKET</h2>
+            <button class="button" id="approval-button" onclick="approveTokenToMarket()">APPROVE</button>
+         </div>
+         <div id="set-discord" class="onboarding hidden" style="text-align: center;">
+            <h2>SET DISCORD</h2>
+            <button class="button" id="set-discord-button" onclick="setDiscord()">SET DISCORD</button>
+         </div>
       </div>
    </div>
-   <br>
    <div id="market-section" class="section body-section body-1 wf-section">
       <div id="selector-div">
          <button id="live-button" class="button active" onclick="showLive()">ACTIVE LISTINGS<span id="num-live"><br>(-)</span></button>

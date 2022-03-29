@@ -91,10 +91,16 @@ const checkTokenApproval = async() => {
     const userAddress = await getAddress();
 
     if (Number(await cheeth.allowance(userAddress, marketAddress)) >= maxInt) {
-        $("#approval-container").addClass("hidden");
+        $("#approval").addClass("hidden");
     }
     else {
-        $("#approval-container").removeClass("hidden");
+        $("#approval").removeClass("hidden");
+    }
+    if ($("#approval").hasClass("hidden") && $("#set-discord").hasClass("hidden")) {
+        $("#onboarding-alert").addClass("hidden");
+    }
+    else {
+        $("#onboarding-alert").removeClass("hidden");
     }
 };
 

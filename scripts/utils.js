@@ -152,6 +152,7 @@ function clearPendingTxs() {
          else {
              await identityMapper.setDiscordIdentity(name).then( async(tx_) => {
                  await waitForTransaction(tx_);
+                 $("#set-discord-button").html(`Setting<span class="one">.</span><span class="two">.</span><span class="three">.</span>`)
                  $('#discord-popup').remove();
                  $('#block-screen-discord').remove();
              });
@@ -172,7 +173,7 @@ function clearPendingTxs() {
  var discordSet = false;
  
  const updateDiscord = async() => {
-     if (!discordSet) {
+    if (!discordSet) {
          let userAddress = await getAddress();
          let currentDiscord = await identityMapper.addressToDiscord(userAddress);
          if (currentDiscord) {
@@ -185,6 +186,7 @@ function clearPendingTxs() {
              $("#discord-mobile").removeClass("failure"); 
          }
          else {
+            $("#set-discord").removeClass("hidden");
              $("#discord-text").text("NOT SET!");
              $("#discord").addClass("failure");
              $("#discord").removeClass("success"); 
@@ -193,6 +195,12 @@ function clearPendingTxs() {
              $("#discord-mobile").removeClass("success"); 
          }
      }
+    if ($("#approval").hasClass("hidden") && $("#set-discord").hasClass("hidden")) {
+        $("#onboarding-alert").addClass("hidden");
+    }
+    else {
+        $("#onboarding-alert").removeClass("hidden");
+    }
  }
  
  var timeout = 100;
