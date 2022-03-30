@@ -99,7 +99,7 @@ const loadCollectionsData = async() => {
         let discordsAndBuyers = await Promise.all(buyers.map(async (buyer) => {
             let discord = await identityMapper.addressToDiscord(buyer);
             let discordResult = discord ? discord : "Discord Unknown";
-            return `${discordResult}: ${buyer}`;
+            return {discord: discordResult, address: buyer};
         }));
         projectToWL.set(title, discordsAndBuyers);
         fakeJSX += `<option value="${title}">${title}</option>`;
@@ -122,7 +122,14 @@ const loadMyWL = async() => {
 }
 
 function selectListing(listingName) {
-    let wlArray = [...(projectToWL.get(listingName))];
+    let wlArray = [...(projectToWL.get(listingName))].map(x => {
+        if (x.discord) {
+            return `${x.discord}: ${x.address}`;
+        }
+        else {
+            return x.address;
+        }
+    });
     let wlString = wlArray.join("<br>");
     $("#wl-section").empty();
     $("#wl-section").html(wlString);
@@ -130,9 +137,19 @@ function selectListing(listingName) {
 }
 
 function updateDownload(listingName) {
-    let filename = `Anonymice - ${listingName} WL.txt`;
-    let wlArray = [...(projectToWL.get(listingName))];
+    let filename = `Anonymice - ${listingName} WL.csv`;
+    let wlArray = [...(projectToWL.get(listingName))].map(x => {
+        if (x.discord) {
+            headerRow = "DISCORD,ADDRESS\n";
+            return `"${x.discord}","${x.address}"`;
+        }
+        else {
+            headerRow = "ADDRESS\n";
+            return `"${x.address}"`;
+        }
+    });
     let wlString = wlArray.join("\n");
+    wlString = headerRow + wlString;
 
     $("#download-link").attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(wlString));
     $("#download-link").attr('download', filename);
