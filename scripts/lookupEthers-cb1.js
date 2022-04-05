@@ -91,6 +91,7 @@ const loadCollectionsData = async() => {
     for (let i = 0; i < numListings; i++) {
         let buyers = await market.getWLPurchasersOf(cheethAddress, i);
         let WLinfo = await market.contractToWLVendingItems(cheethAddress, i);
+        console.log("WLinfo", WLinfo);
         let title = WLinfo.title;
         let purchased = buyers.includes(userAddress);
         if (purchased) {
