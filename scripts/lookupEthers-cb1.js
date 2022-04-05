@@ -81,36 +81,54 @@ const updateTokenBalance = async() => {
     $("#mobile-balance").html(`${balance}`);
 }
 
+const splitArrayToChunks = (array_, chunkSize_) => {
+    let _arrays = Array(Math.ceil(array_.length / chunkSize_))
+        .fill()
+        .map((_, index) => index * chunkSize_)
+        .map((begin) => array_.slice(begin, begin + chunkSize_));
+
+    return _arrays;
+};
+
 var projectToWL = new Map();
 var myWL = [];
 
 const loadCollectionsData = async() => {
     let userAddress = await getAddress();
-    let numListings = await market.getWLVendingItemsLength(cheethAddress);
+    let numListings = Number(await market.getWLVendingItemsLength(cheethAddress));
     let fakeJSX = "";
-    for (let i = 0; i < numListings; i++) {
-        let buyers = await market.getWLPurchasersOf(cheethAddress, i);
-        let WLinfo = await market.contractToWLVendingItems(cheethAddress, i);
-        console.log("WLinfo", WLinfo);
-        let title = WLinfo.title;
-        let deadline = WLinfo.deadline;
-        let purchased = buyers.includes(userAddress);
-        if (purchased) {
-            myWL.push(title);
-        }
-        let discordsAndBuyers = await Promise.all(buyers.map(async (buyer) => {
-            let discord = await identityMapper.addressToDiscord(buyer);
-            let discordResult = discord ? discord : "Discord Unknown";
-            return {discord: discordResult, address: buyer};
-        }));
-        projectToWL.set(title+deadline, discordsAndBuyers);
-        fakeJSX += `<option value="${title+deadline}">${title} ${(new Date(deadline*1000)).toLocaleDateString()} ${(new Date(deadline*1000)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</option>`;
-        if (i == 0) {
-            selectListing(title+deadline);
-        }
+    let allListingIds = Array.from(Array(numListings).keys());
+    const chunks = splitArrayToChunks(allListingIds, 20);
+    let idToJSX = new Map();
+    let fullJSX = "";
+    for (const chunk of chunks) {
+        await Promise.all( chunk.map( async(id) => {
+            let buyers = await market.getWLPurchasersOf(cheethAddress, id);
+            let WLinfo = await market.contractToWLVendingItems(cheethAddress, id);
+            let title = WLinfo.title;
+            let deadline = WLinfo.deadline;
+            let purchased = buyers.includes(userAddress);
+            if (purchased) {
+                myWL.push(title);
+            }
+            let discordsAndBuyers = await Promise.all(buyers.map(async (buyer) => {
+                let discord = await identityMapper.addressToDiscord(buyer);
+                let discordResult = discord ? discord : "Discord Unknown";
+                return {discord: discordResult, address: buyer};
+            }));
+            projectToWL.set(title+deadline, discordsAndBuyers);
+            fakeJSX = `<option value="${title+deadline}">${title} ${(new Date(deadline*1000)).toLocaleDateString()} ${(new Date(deadline*1000)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</option>`;
+            idToJSX.set(id, fakeJSX)
+            if (id == 0) {
+                selectListing(title+deadline);
+            }
+        }))
+    };
+    for (const listingId of allListingIds) {
+        fullJSX += idToJSX.get(listingId);
     }
     $("#listing-select").empty();
-    $("#listing-select").append(fakeJSX);
+    $("#listing-select").append(fullJSX);
 }
 
 const loadMyWL = async() => {
@@ -246,7 +264,7 @@ window.onload = async()=>{
         $("#workshop").removeClass("hidden");
         $("#workshop-mobile").removeClass("hidden");
     }
-    $("#your-wl-spots").html(`Loading<span class="one">.</span><span class="two">.</span><span class="three">.</span>`);
+    $("#your-wl-spots").html(`LOADING<span class="one">.</span><span class="two">.</span><span class="three">.</span>`);
     await loadCollectionsData();
     await loadMyWL();
     await updateTokenBalance();
