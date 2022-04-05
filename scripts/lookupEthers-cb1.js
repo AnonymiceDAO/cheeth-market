@@ -93,6 +93,7 @@ const loadCollectionsData = async() => {
         let WLinfo = await market.contractToWLVendingItems(cheethAddress, i);
         console.log("WLinfo", WLinfo);
         let title = WLinfo.title;
+        let deadline = WLinfo.deadline;
         let purchased = buyers.includes(userAddress);
         if (purchased) {
             myWL.push(title);
@@ -102,10 +103,10 @@ const loadCollectionsData = async() => {
             let discordResult = discord ? discord : "Discord Unknown";
             return {discord: discordResult, address: buyer};
         }));
-        projectToWL.set(title, discordsAndBuyers);
-        fakeJSX += `<option value="${title}">${title}</option>`;
+        projectToWL.set(title+deadline, discordsAndBuyers);
+        fakeJSX += `<option value="${title+deadline}">${title} ${(new Date(deadline*1000)).toLocaleDateString()} ${(new Date(deadline*1000)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</option>`;
         if (i == 0) {
-            selectListing(title);
+            selectListing(title+deadline);
         }
     }
     $("#listing-select").empty();
@@ -122,8 +123,8 @@ const loadMyWL = async() => {
     }
 }
 
-function selectListing(listingName) {
-    let wlArray = [...(projectToWL.get(listingName))].map(x => {
+function selectListing(listingKey) {
+    let wlArray = [...(projectToWL.get(listingKey))].map(x => {
         if (x.discord) {
             return `${x.discord}: ${x.address}`;
         }
@@ -134,12 +135,12 @@ function selectListing(listingName) {
     let wlString = wlArray.join("<br>");
     $("#wl-section").empty();
     $("#wl-section").html(wlString);
-    updateDownload(listingName);
+    updateDownload(listingKey);
 }
 
-function updateDownload(listingName) {
-    let filename = `Anonymice - ${listingName} WL.csv`;
-    let wlArray = [...(projectToWL.get(listingName))].map(x => {
+function updateDownload(listingKey) {
+    let filename = `Anonymice - ${listingKey} WL.csv`;
+    let wlArray = [...(projectToWL.get(listingKey))].map(x => {
         if (x.discord) {
             headerRow = "DISCORD,ADDRESS\n";
             return `"${x.discord}","${x.address}"`;
