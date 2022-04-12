@@ -163,6 +163,51 @@ const splitArrayToChunks = (array_, chunkSize_) => {
 };
 
 var loadedCollections = false;
+var liveListings = [];
+var liveTimerPending = [];
+
+setInterval(async()=>{
+    if (loadedCollections) {
+        for (let i = 0; i < liveListings.length; i++) {
+            if (liveTimerPending[i]) {
+                let id = liveListings[i];
+                let now = Date.now() / 1000;
+                let endTime = Number((await market.contractToWLVendingItems(cheethAddress, id)).deadline);
+                let distance = endTime - now;
+        
+                var hours = Math.floor(distance / (60 * 60));
+                var minutes = Math.floor((distance % (60 * 60)) / (60));
+                var seconds = Math.floor((distance % (60)));
+
+                if (hours < 10) {
+                    hours = `0${hours}`;
+                }
+                if (minutes < 10) {
+                    minutes = `0${minutes}`;
+                }
+                if (seconds < 10) {
+                    seconds = `0${seconds}`;
+                }
+                              
+                if (distance <= 0) {
+                    let blockTime = (await provider.getBlock((await provider.getBlockNumber()))).timestamp;
+                    if (blockTime > endTime) {
+                        liveTimerPending[i] = false;
+                        $(`#timer-${id}`).html("EXPIRED");
+                        $(`#timer-${id}`).removeClass("pending");
+                    }
+                    else {
+                        $(`#timer-${id}`).html(`ENDS NEXT BLOCK<span class="one">.</span><span class="two">.</span><span class="three">.</span>`);
+                    }
+                }
+                else {
+                    $(`#timer-${id}`).html(`ENDS IN ${hours}:${minutes}:${seconds}`);
+                    $(`#timer-${id}`).addClass("pending");
+                }
+            }
+        }
+    }
+}, 1000)
 
 const loadCollections = async() => {
     const userAddress = await getAddress();
@@ -197,6 +242,8 @@ const loadCollections = async() => {
             let projectUri = (WLinfo.projectUri).includes("https://") ? WLinfo.projectUri : `https://${WLinfo.projectUri}`;
 
             if (minted != maxSlots && valid) {
+                liveListings.push(id);
+                liveTimerPending.push(true);
                 numLive += 1;
                 let button;
                 if (purchased) {
@@ -206,7 +253,7 @@ const loadCollections = async() => {
                     button = `<button class="mint-prompt-button button" id="${id}-mint-button" onclick="purchase('${cheethAddress}', ${id})">PURCHASE</button>`;
                 }
                 let fakeJSX = `<div class="partner-collection" id="project-${id}">
-                                <h4><span class="end-time">Ends ${(new Date(WLinfo.deadline*1000)).toLocaleDateString()} ${(new Date(WLinfo.deadline*1000)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></h4>
+                                <h4 class="end-time" id="timer-${id}"><span class="one">.</span><span class="two">.</span><span class="three">.</span></h4>
                                 <img class="collection-img" src="${imageUri}">
                                 <div class="collection-info">
                                     <h3><a class="clickable link" href="${projectUri}" target="_blank" style="text-decoration: none;">${WLinfo.title}⬈</a></h3>
