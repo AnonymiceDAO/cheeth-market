@@ -175,6 +175,17 @@
     justify-content: flex-start;
 }
 
+.partner-collection .website {
+    position: absolute;
+    top: 2%;
+    left: 2%;
+    width: 15%;
+}
+
+.partner-collection .website:hover {
+    opacity: .6;
+}
+
 .partner-collection h3 {
     font-size: 1.8vw;
     line-height: 1.8vw;
