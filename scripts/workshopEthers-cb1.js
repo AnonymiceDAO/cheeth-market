@@ -98,10 +98,7 @@ const addListing = async() => {
     try {
         let start = (new Date($(`#create-input #listing-start`).val()).valueOf())/1000;
         let deadline = (new Date($(`#create-input #listing-deadline`).val()).valueOf())/1000;
-        if (!currentProjectAddress) {
-            await displayErrorMessage("Select a project to add listing!")
-        }
-        else if (start > deadline) {
+        if (start > deadline) {
             await displayErrorMessage("Error: Start time must be before deadline!");
         }
         else {
@@ -179,7 +176,7 @@ const selectListing = async(id) => {
 }
 
 const generateModify = async() => {
-    let currentlySelectedWLinfo = await market.contractToWLVendingItems(cheethAddress, id);
+    let currentlySelectedWLinfo = await market.contractToWLVendingItems(cheethAddress, currentlySelected);
     let title = $("#modify-input #listing-title").val() ? $("#modify-input #listing-title").val() : currentlySelectedWLinfo.title;
     let image = $("#modify-input #listing-image").val()? $("#modify-input #listing-image").val() : currentlySelectedWLinfo.imageUri;
     let site = $("#modify-input #listing-site").val() ? $("#modify-input #listing-site").val() : currentlySelectedWLinfo.projectUri;
@@ -209,7 +206,7 @@ const generateModify = async() => {
 
 const modifyListing = async() => {
     try {
-        let currentlySelectedWLinfo = await market.contractToWLVendingItems(cheethAddress, id);
+        let currentlySelectedWLinfo = await market.contractToWLVendingItems(cheethAddress, currentlySelected);
         let title = $("#modify-input #listing-title").val() ? $("#modify-input #listing-title").val() : currentlySelectedWLinfo.title;
         let image = $("#modify-input #listing-image").val()? $("#modify-input #listing-image").val() : currentlySelectedWLinfo.imageUri;
         let site = $("#modify-input #listing-site").val() ? $("#modify-input #listing-site").val() : currentlySelectedWLinfo.projectUri;
@@ -230,7 +227,7 @@ const modifyListing = async() => {
             await displayErrorMessage("Error: Start time must be before deadline!");
         }
         else {
-            await market.modifyWLVendingItem(cheethAddress, currentlySelectedListing, [title, image, siteFormatted, description, amount, purchased, start, deadline, price]).then( async(tx_) => {
+            await market.modifyWLVendingItem(cheethAddress, currentlySelected, [title, image, siteFormatted, description, amount, purchased, start, deadline, price]).then( async(tx_) => {
                 await waitForTransaction(tx_);
             });
         }
